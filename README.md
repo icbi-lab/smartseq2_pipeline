@@ -24,7 +24,19 @@ The nf-core/smartseq pipeline comes with documentation about the pipeline, found
 4. [Output and how to interpret the results](docs/output.md)
 5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
-<!-- TODO nf-core: Add a brief overview of what the pipeline does and how it works -->
+
+This pipeline was developed to process single cell RNA-seq data generated 
+using the Smart-Seq2 protocol.
+
+The pipeline features: 
+* Quality control using `fastqc` and `multiqc`
+* Alignment using `STAR`
+* Quantification using `rsem` or `featureCounts`
+* TCR analysis using `TraCeR`.
+
+![flowchart](assets/flowchart.png)
+
 
 ## Credits
-nf-core/smartseq was originally written by grst.
+nf-core/smartseq was originally written by [Sandro Carollo](https://github.com/sandrocarollo),
+[Giorgos Fotakis](https://github.com/abyssum) and [Gregor Sturm](https://github.com/grst)
