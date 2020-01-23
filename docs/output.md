@@ -39,3 +39,30 @@ The pipeline has special steps which allow the software versions used to be repo
   * Directory containing parsed statistics from the different tools used in the pipeline
 
 For more information about how to use MultiQC reports, see [http://multiqc.info](http://multiqc.info)
+
+
+# smartseq2
+## 3. Output
+The pipeline creates an ouput directory with the following structure:
+```
+OUTPUT_DIRECTORY
+├── Expresion
+│   ├── <readsId>_STAR
+│   ├── <readsId>.genes.results
+│   ├── <readsId>.count.txt
+│   ├── resultCOUNT.txt
+│   └── resultTPM.txt
+├── Quality_Control
+│   ├── <readsId>_fastqc
+│   ├── multiqc_data
+│   └── multiqc_report.html
+└── TraCeR
+    ├── <readsId>
+    └── filtered_TCRAB_summary
+
+```
+The Count Matrix and the TPM Matrix are inside resultCOUNT.txt and resultTPM.txt respectively
+
+The Quality Control report is inside multiqc_report.html
+
+The TCR analysis results are inside the filtered_TCRAB_summary folder

@@ -280,3 +280,25 @@ Set to disable colourful command line output and live life in monochrome.
 
 ### `--multiqc_config`
 Specify a path to a custom MultiQC configuration file.
+
+
+# smartseq2
+Before running the pipeline, the `nextflow.config` file has to be edited. In the
+params.references the path to the references has to be defined.
+
+Every parameter like `outputDir`, `pattern` etc. can also be edited in the 
+params parth or directly through the command line by using `--NameOfTheParameter`
+given in the config file.
+
+Here's an example:
+
+```
+nextflow run pipeline.nf --reads=/folder/of/the/reads --outputDir=/result/directory --pattern=*_[1,2]*.fastq
+```
+
+### Mandatory arguments:
+`--reads` -> for the input file
+`--outputDir` -> for the output files
+
+### Optional arguments:
+`--pattern` -> if the fastq files have a name that the pipeline is not able to recognize use the RegEx to set a new one
