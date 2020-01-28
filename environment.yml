@@ -9,4 +9,4 @@ dependencies:
   - fastqc=0.11.8
   - multiqc=1.7
   - subread=1.6.3
-  - pandoc=2.9.11
+  - pandoc=2.9.1.1

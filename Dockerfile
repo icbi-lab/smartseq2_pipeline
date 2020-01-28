@@ -1,4 +1,4 @@
-FROM nfcore/base:1.7
+FROM nfcore/base:1.8
 LABEL authors="grst" \
       description="Docker image containing all requirements for nf-core/smartseq pipeline"
 
