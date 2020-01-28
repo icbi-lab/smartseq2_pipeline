@@ -206,13 +206,26 @@ if (!params.skip_transcriptomics) {
             script:
             def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
             """
+            # unzip files if required
+            if [[ "${fasta}" == *".gz"* ]]; then
+                gunzip -c ${fasta} > genome.fa
+            else
+                ln -s ${fasta} genome.fa
+            fi
+            if [[ "${gtf}" == *".gz"* ]]; then
+                gunzip -c ${gtf} > annotation.gtf 
+            else
+                ln -s ${gtf} annotation.gtf 
+            fi
+
+            # make index
             mkdir star
             STAR \\
                 --runMode genomeGenerate \\
                 --runThreadN ${task.cpus} \\
-                --sjdbGTFfile $gtf \\
+                --sjdbGTFfile annotation.gtf \\
                 --genomeDir star/ \\
-                --genomeFastaFiles $fasta \\
+                --genomeFastaFiles genome.fa \\
                 $avail_mem
             """
         }
@@ -233,14 +246,27 @@ if (!params.skip_rsem && !params.skip_transcriptomics) {
             publishDir path: { params.save_reference ? "${params.outdir}/reference_genome" : params.outdir },
                         saveAs: { params.save_reference ? it : null }, mode: "$mode"
             input:
-                file "genome.fa" from fasta_rsem_ref
-                file "annotation.gtf" from gtf_rsem_ref
+                file fasta from fasta_rsem_ref
+                file gtf from gtf_rsem_ref
 
             output:
                 file "rsem" into rsem_ref
 
             script:
             """
+            # unzip files if required
+            if [[ "${fasta}" == *".gz"* ]]; then
+                gunzip -c ${fasta} > genome.fa
+            else
+                ln -s ${fasta} genome.fa
+            fi
+            if [[ "${gtf}" == *".gz"* ]]; then
+                gunzip -c ${gtf} > annotation.gtf 
+            else
+                ln -s ${gtf} annotation.gtf 
+            fi
+
+            # make reference
             mkdir rsem
             rsem-prepare-reference --gtf annotation.gtf genome.fa rsem/ref
             """
@@ -400,13 +426,15 @@ if (!params.skip_transcriptomics) {
 
             script:
             """
+            REF_FILENAME=\$(basename rsem/*.grp)
+            REF_NAME="\${REF_FILENAME%.*}"
             rsem-calculate-expression -p ${task.cpus} --paired-end \
             --bam \
             --estimate-rspd \
             --append-names \
             --output-genome-bam \
             ${in_bam} \
-            rsem/ref \
+            rsem/\$REF_NAME \
             ${sample_bam}
             """
         }
