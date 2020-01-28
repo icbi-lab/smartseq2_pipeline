@@ -45,6 +45,8 @@ FROM teichlab/tracer:latest
 # #placing a preconfigured tracer.conf in ~/.tracerrc
 # RUN cp /tracer/docker_helper_files/docker_tracer.conf ~/.tracerrc
 
+RUN apt-get update && apt-get install -y procps && apt-get clean -y
+
 ENV TRACER_CONF /tracer/docker_helper_files/docker_tracer.conf
 ENV IGDATA /ncbi-igblast-1.7.0/bin
 #this is a tracer container, so let's point it at a tracer wrapper that sets the silly IgBLAST environment variable thing

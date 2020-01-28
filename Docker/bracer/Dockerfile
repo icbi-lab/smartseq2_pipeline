@@ -68,6 +68,8 @@ FROM teichlab/bracer
 # #placing a preconfigured bracer.conf in ~/.bracerrc
 # RUN cp /bracer/docker_helper_files/docker_bracer.conf ~/.bracerrc
 
+RUN apt-get update && apt-get install -y procps && apt-get clean -y
+
 ENV BRACER_CONF /bracer/docker_helper_files/docker_bracer.conf
 ENV IGDATA /ncbi-igblast-1.4.0/bin
 
