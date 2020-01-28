@@ -622,14 +622,14 @@ process output_documentation {
     publishDir "${params.outdir}/pipeline_info", mode: 'copy'
 
     input:
-    file output_docs from ch_output_docs
+    file "output_docs.md" from ch_output_docs
 
     output:
     file "results_description.html"
 
     script:
     """
-    markdown_to_html.r $output_docs results_description.html
+    pandoc output_docs.md -o results_description.html --self-contained --standalone
     """
 }
 
