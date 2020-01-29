@@ -74,12 +74,20 @@ if (params.genomes && params.genome && !params.genomes.containsKey(params.genome
     exit 1, "The provided genome '${params.genome}' is not available in the iGenomes file. Currently the available genomes are ${params.genomes.keySet().join(", ")}"
 }
 
-// TODO nf-core: Add any reference files that are needed
 // Configurable reference genomes
 fasta = params.genome ? params.genomes[ params.genome ].fasta ?: false : false
 if ( params.fasta ){
     fasta = file(params.fasta)
     if( !fasta.exists() ) exit 1, "Fasta file not found: ${params.fasta}"
+}
+
+gtf = params.genome ? params.genomes[ params.genome ].gtf ?: false : false
+if ( params.gtf ){
+    gtf = file(params.gtf)
+    if( !gtf.exists() ) exit 1, "GTF file not found: ${params.gtf}"
+}
+if ( !gtf && !(params.skip_fc || params.skip_transcriptomics)) {
+    exit 1, "No GTF file provided. Specify either --genome or --gtf. "
 }
 
 
@@ -116,8 +124,8 @@ if(params.readPaths){
         .into { read_files_fastqc; read_files_star; read_files_bracer; read_files_tracer }
 } else {
     Channel
-        .fromFilePairs( params.reads, size: params.singleEnd ? 1 : 2 )
-        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!\nIf this is single-end data, please specify --singleEnd on the command line." }
+        .fromFilePairs( params.reads, size: 2 )
+        .ifEmpty { exit 1, "Cannot find any reads matching: ${params.reads}\nNB: Path needs to be enclosed in quotes!" }
         .into { read_files_fastqc; read_files_star; read_files_bracer; read_files_tracer }
 }
 
@@ -130,7 +138,11 @@ summary['Run Name']         = custom_runName ?: workflow.runName
 // TODO nf-core: Report custom parameters here
 summary['Reads']            = params.reads
 summary['Fasta Ref']        = params.fasta
-summary['Data Type']        = params.singleEnd ? 'Single-End' : 'Paired-End'
+summary["iGenome"]          = params.genome
+summary["star_index"]       = params.star_index
+summary["GTF file"]          = params.gtf
+summary["RSEM ref"]         = params.rsem_ref
+summary["Tracer/Bracer species"] = params.species
 summary['Max Resources']    = "$params.max_memory memory, $params.max_cpus cpus, $params.max_time time per job"
 if(workflow.containerEngine) summary['Container'] = "$workflow.containerEngine - $workflow.container"
 summary['Output dir']       = params.outdir
@@ -182,14 +194,19 @@ ${summary.collect { k,v -> "            <dt>$k</dt><dd><samp>${v ?: '<span style
 outdir = file(params.outdir)
 mode = params.publish_dir_mode
 species = params.species
-Channel.fromPath(params.fasta).into { fasta_star_idx; fasta_rsem_ref }
-Channel.fromPath(params.gtf).into { gtf_star_idx ; gtf_rsem_ref; gtf_feature_counts }
+if (fasta) {
+    Channel.fromPath(fasta).into { fasta_star_idx; fasta_rsem_ref }
+}
+if (gtf) {
+    Channel.fromPath(gtf).into { gtf_star_idx ; gtf_rsem_ref; gtf_feature_counts }
+} 
+
 
 /*
  * PREPROCESSING - Build STAR index
  */
 if (!params.skip_transcriptomics) {
-    if (!params.star_index && params.fasta) {
+    if (!params.star_index && fasta) {
         process makeSTARindex {
             label 'high_memory'
             tag "$fasta"
@@ -207,15 +224,15 @@ if (!params.skip_transcriptomics) {
             def avail_mem = task.memory ? "--limitGenomeGenerateRAM ${task.memory.toBytes() - 100000000}" : ''
             """
             # unzip files if required
+            FASTA=${fasta}
+            GTF=${gtf}
             if [[ "${fasta}" == *".gz"* ]]; then
                 gunzip -c ${fasta} > genome.fa
-            else
-                ln -s ${fasta} genome.fa
+                FASTA=genome.fa
             fi
             if [[ "${gtf}" == *".gz"* ]]; then
                 gunzip -c ${gtf} > annotation.gtf 
-            else
-                ln -s ${gtf} annotation.gtf 
+                GTF=annotation.gtf
             fi
 
             # make index
@@ -223,9 +240,9 @@ if (!params.skip_transcriptomics) {
             STAR \\
                 --runMode genomeGenerate \\
                 --runThreadN ${task.cpus} \\
-                --sjdbGTFfile annotation.gtf \\
+                --sjdbGTFfile \$GTF \\
                 --genomeDir star/ \\
-                --genomeFastaFiles genome.fa \\
+                --genomeFastaFiles \$FASTA \\
                 $avail_mem
             """
         }
@@ -241,7 +258,7 @@ if (!params.skip_transcriptomics) {
  * PREPROCESSING - Build RSEM reference
  */
 if (!params.skip_rsem && !params.skip_transcriptomics) {
-    if (!params.rsem_ref && params.fasta) {
+    if (!params.rsem_ref && fasta && gtf) {
         process make_rsem_reference {
             publishDir path: { params.save_reference ? "${params.outdir}/reference_genome" : params.outdir },
                         saveAs: { params.save_reference ? it : null }, mode: "$mode"
@@ -255,20 +272,20 @@ if (!params.skip_rsem && !params.skip_transcriptomics) {
             script:
             """
             # unzip files if required
+            FASTA=${fasta}
+            GTF=${gtf}
             if [[ "${fasta}" == *".gz"* ]]; then
                 gunzip -c ${fasta} > genome.fa
-            else
-                ln -s ${fasta} genome.fa
+                FASTA=genome.fa
             fi
             if [[ "${gtf}" == *".gz"* ]]; then
                 gunzip -c ${gtf} > annotation.gtf 
-            else
-                ln -s ${gtf} annotation.gtf 
+                GTF=annotation.gtf
             fi
-
+            
             # make reference
             mkdir rsem
-            rsem-prepare-reference --gtf annotation.gtf genome.fa rsem/ref
+            rsem-prepare-reference --gtf \$GTF \$FASTA rsem/ref
             """
         }
     } else {
