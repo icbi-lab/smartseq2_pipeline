@@ -42,13 +42,11 @@ The pipeline has special steps which allow the software versions used to be repo
 
 For more information about how to use MultiQC reports, see [http://multiqc.info](http://multiqc.info)
 
-# smartseq2
-
-## 3. Output
+## smartseq2
 
 The pipeline creates an ouput directory with the following structure:
 
-```
+```plain
 OUTPUT_DIRECTORY
 ├── Expresion
 │   ├── <readsId>_STAR
@@ -63,7 +61,6 @@ OUTPUT_DIRECTORY
 └── TraCeR
     ├── <readsId>
     └── filtered_TCRAB_summary
-
 ```
 
 The Count Matrix and the TPM Matrix are inside resultCOUNT.txt and resultTPM.txt respectively
