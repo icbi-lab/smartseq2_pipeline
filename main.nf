@@ -301,7 +301,7 @@ if (!params.skip_rsem && !params.skip_transcriptomics) {
  */
 if (!params.skip_fastqc) {
     process fastqc {
-        publishDir "$outdir/Quality_Control/${sample}_fastqc", mode: "$mode"
+        publishDir "$outdir/fastqc/${sample}_fastqc", mode: "$mode"
         input:
             set sample, file(in_fastq) from read_files_fastqc
 
@@ -324,7 +324,7 @@ if (!params.skip_transcriptomics) {
     * Step 2 - STAR
     */
     process STAR {
-        publishDir "$outdir/Expression/${sample_fq}_STAR", mode: "$mode"
+        publishDir "$outdir/STAR/${sample_fq}_STAR", mode: "$mode"
         input:
             set sample_fq, file(in_fastq) from read_files_star
             file "star" from star_index.collect()
@@ -354,7 +354,7 @@ if (!params.skip_transcriptomics) {
     */
     if(!params.skip_fc) {
         process featureCounts {
-            publishDir "$outdir/Expression", mode: "$mode"
+            publishDir "$outdir/featureCounts/$sample", mode: "$mode"
             input:
                 set sample, file(bsort) from bam_sort_filesgz
                 file anno_file from gtf_feature_counts.collect()
@@ -405,7 +405,7 @@ if (!params.skip_transcriptomics) {
         * "too many open files" when pasting all filese in one go. 
         */
         process make_matrices_fc {
-            publishDir "$outdir/Expression", mode: "$mode"
+            publishDir "$outdir/featureCounts", mode: "$mode"
 
             input:
                 file x from result_files_fc.collect()
@@ -431,7 +431,7 @@ if (!params.skip_transcriptomics) {
     */
     if(!params.skip_rsem) {
         process rsem {
-            publishDir "$outdir/Expression", mode: "$mode"
+            publishDir "$outdir/RSEM/$sample_bam", mode: "$mode"
             input:
                 set sample_bam, file(in_bam) from bam_trans_filesgz
                 file "rsem" from rsem_ref.collect()
@@ -460,8 +460,6 @@ if (!params.skip_transcriptomics) {
         * Step 5b - summarize RSEM TPM
         */
         process summmarize_TPM {
-
-            publishDir "$outdir/Expression", mode: "$mode"
             input:
                 // do so in chunks, to avoid limit MAX_OPEN_FILES limit
                 file y from tpm_files1.collate(100)
@@ -486,8 +484,8 @@ if (!params.skip_transcriptomics) {
         * This additional step is required because of a failure with
         * "too many open files" when pasting all filese in one go. 
         */
-        process make_result_files {
-            publishDir "$outdir/Expression", mode: "$mode"
+        process make_matrices_tpm {
+            publishDir "$outdir/RSEM", mode: "$mode"
 
             input:
                 file z from result_files_tpm.collect()
@@ -517,7 +515,7 @@ if (!params.skip_transcriptomics) {
  * Step 4
  */
 process multiqc {
-    publishDir "$outdir/Quality_Control", mode: "$mode"
+    publishDir "$outdir/multiqc", mode: "$mode"
 
     input:
     file ('fastqc/*') from fastqc_files.collect().ifEmpty([])

@@ -50,8 +50,6 @@ It is recommended to limit the Nextflow Java virtual machines memory. We recomme
 NXF_OPTS='-Xms1g -Xmx4g'
 ```
 
-<!-- TODO nf-core: Document required command line parameters to run the pipeline-->
-
 ## Running the pipeline
 
 The typical command for running the pipeline is as follows:
@@ -100,6 +98,7 @@ If `-profile` is not specified at all the pipeline will be run locally and expec
 - `conda`
   - A generic configuration profile to be used with [conda](https://conda.io/docs/)
   - Pulls most software from [Bioconda](https://bioconda.github.io/)
+  - Does not work with TraCeR or BraCeR enabled (those require either `docker` or `singularity`)
 - `docker`
   - A generic configuration profile to be used with [Docker](http://docker.com/)
   - Pulls software from dockerhub: [`nfcore/smartseq`](http://hub.docker.com/r/nfcore/smartseq/)
@@ -109,8 +108,6 @@ If `-profile` is not specified at all the pipeline will be run locally and expec
 - `test`
   - A profile with a complete configuration for automated testing
   - Includes links to test data so needs no other parameters
-
-<!-- TODO nf-core: Document required command line parameters -->
 
 ### `--reads`
 
@@ -128,15 +125,11 @@ Please note the following requirements:
 
 If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
 
-### `--singleEnd`
+### `--species`
 
-By default, the pipeline expects paired-end data. If you have single-end data, you need to specify `--singleEnd` on the command line when you launch the pipeline. A normal glob pattern, enclosed in quotation marks, can then be used for `--reads`. For example:
-
-```bash
---singleEnd --reads '*.fastq'
-```
-
-It is not possible to run a mixture of single-end and paired-end files in one run.
+Species to use for `BraCeR` and `TraCeR`. Can be either `Hsap` for human or `Mmus` for mouse.
+Defaults to `Hsap`. Building curstom references with TraCeR/BraCeR is possible
+but currently not supported by the pipeline.
 
 ## Reference genomes
 
@@ -163,20 +156,17 @@ Note that you can use the same configuration setup to save sets of reference fil
 
 The syntax for this reference configuration is as follows:
 
-<!-- TODO nf-core: Update reference genome example according to what is needed -->
-
 ```nextflow
 params {
   genomes {
     'GRCh37' {
       fasta   = '<path to the genome fasta file>' // Used if no star index given
+      gtf = '<path to the gtf annotation file>'
     }
     // Any number of additional genomes, key is used with --genome
   }
 }
 ```
-
-<!-- TODO nf-core: Describe reference path flags -->
 
 ### `--fasta`
 
@@ -186,9 +176,43 @@ If you prefer, you can specify the full path to your reference genome when you r
 --fasta '[path to Fasta reference]'
 ```
 
-### `--igenomesIgnore`
+### `--gtf`
+
+Similarly, you can specify a custom annotation `gtf` file:
+
+```bash
+--gtf 'path to gtf file'
+```
+
+### `--star_index`, `--rsem_ref`
+
+If you already have a STAR and RSEM reference, you can directly specify them in
+order to avoid re-building them.
+
+```bash
+--star_index `/path/to/star_index`  --rsem_ref `/path/to/rsem_ref/`
+```
+
+### `--save_reference`
+
+Supply this parameter to save any generated reference genome files to your results folder. These can then be used for future pipeline runs, reducing processing times.
+
+### `--igenomes_ignore`
 
 Do not load `igenomes.config` when running the pipeline. You may choose this option if you observe clashes between custom parameters and those supplied in `igenomes.config`.
+
+## Skipping individual steps
+
+You can skip individual analysis steps using the following flags.
+
+```bash
+--skip_fastqc             # Skip quality control with FastQC
+--skip_transcriptomics    # Skip alignment and gene expression quantification
+--skip_fc                 # Skip gene expression quantification with featureCounts
+--skip_rsem               # Skip gene expression quantificaiton with RSEM
+--skip_tracer             # Skip TraCeR
+--skip_bracer             # Skip BraCeR
+```
 
 ## Job resources
 
@@ -229,6 +253,19 @@ The output directory where the results will be saved.
 ### `--email`
 
 Set this parameter to your e-mail address to get a summary e-mail with details of the run sent to you when the workflow exits. If set in your user config file (`~/.nextflow/config`) then you don't need to specify this on the command line for every run.
+
+### `--publish_dir_mode`
+
+Choose how files will be staged in the output directory.
+Can be either of
+
+- `link`: hardlink
+- `symlink`: symlink with absolute paths
+- `rellink`: symlink with relative path
+- `copy`
+
+Defaults to `symlink`. This implies that deleting the `work` directory will
+also remove your result files.
 
 ### `-name`
 
@@ -310,27 +347,3 @@ Set to disable colourful command line output and live life in monochrome.
 ### `--multiqc_config`
 
 Specify a path to a custom MultiQC configuration file.
-
-## smartseq2
-
-Before running the pipeline, the `nextflow.config` file has to be edited. In the
-params.references the path to the references has to be defined.
-
-Every parameter like `outputDir`, `pattern` etc. can also be edited in the
-params parth or directly through the command line by using `--NameOfTheParameter`
-given in the config file.
-
-Here's an example:
-
-```bash
-nextflow run pipeline.nf --reads=/folder/of/the/reads --outputDir=/result/directory --pattern=*_[1,2]*.fastq
-```
-
-### Mandatory arguments
-
-`--reads` -> for the input file
-`--outputDir` -> for the output files
-
-### Optional arguments
-
-`--pattern` -> if the fastq files have a name that the pipeline is not able to recognize use the RegEx to set a new one

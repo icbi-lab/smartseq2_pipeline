@@ -35,36 +35,69 @@ The pipeline has special steps which allow the software versions used to be repo
 
 **Output directory: `results/multiqc`**
 
-- `Project_multiqc_report.html`
+- `multiqc_report.html`
   - MultiQC report - a standalone HTML file that can be viewed in your web browser
-- `Project_multiqc_data/`
+- `multiqc_data/`
   - Directory containing parsed statistics from the different tools used in the pipeline
 
 For more information about how to use MultiQC reports, see [http://multiqc.info](http://multiqc.info)
 
-## smartseq2
+## BraCeR
 
-The pipeline creates an ouput directory with the following structure:
+[BraCeR](https://github.com/Teichlab/bracer) is a tool for reconstruction of B cell receptor sequences from single-cell RNA-seq data.
 
-```plain
-OUTPUT_DIRECTORY
-├── Expresion
-│   ├── <readsId>_STAR
-│   ├── <readsId>.genes.results
-│   ├── <readsId>.count.txt
-│   ├── resultCOUNT.txt
-│   └── resultTPM.txt
-├── Quality_Control
-│   ├── <readsId>_fastqc
-│   ├── multiqc_data
-│   └── multiqc_report.html
-└── TraCeR
-    ├── <readsId>
-    └── filtered_TCRAB_summary
-```
+**Output direcetory: `results/BraCeR`**
 
-The Count Matrix and the TPM Matrix are inside resultCOUNT.txt and resultTPM.txt respectively
+- `filtered_BCR_summary/IMGT_gapped_db.tab`
+  - summary of all detected Immunoglobuling chains for all cells
+- `<CELL>`
+  - For each cell, there's a dedicated output directory containing more detailed information than what's in the summary.
 
-The Quality Control report is inside multiqc_report.html
+## TraCeR
 
-The TCR analysis results are inside the filtered_TCRAB_summary folder
+[TraCeR](https://github.com/Teichlab/tracer) is a tool for reconstruction of T cell receptor sequences from single-cell RNA-seq data.
+
+**Output directory: `results/TraCeR`**
+
+- `filtered_TCR_summary/cell_data.csv`
+  - summary of all detected T cell receptor chains for all cells
+- `<CELL>`
+  - For each cell, there's a dedicated output directory containing more detailed information than what's in the summary.
+
+## STAR
+
+[STAR](https://github.com/alexdobin/STAR) is a ultra-fast RNA-seq aligner.
+
+**Output directory: `results/STAR`**
+
+- `<CELL>`/<CELL>.Aligned.toTranscriptome.out.bam`
+  - BAM file aligned to the transcriptome
+- `<CELL>`/<CELL>.Aligned.sortedByCoord.out.bam`
+  - The same BAM file, but sorted
+- `<CELL>`/<CELL>.Log.final.out`
+  - The STAR alignment report, containing mapping results summary.
+
+## RSEM
+
+[RSEM](https://github.com/deweylab/RSEM) is a tool for the accurate quantification of gene and isoform expression
+from RNA-seq data. We use it to compute Transcript per Million (TPM)-normalized gene expression
+values for each cell.
+
+**Output directory: `results/RSEM`**
+
+- `resultTPM.txt`
+  - tab separated TPM matrix for all genes and cells.
+- `<CELL>`
+  - For each cell, there's a dedicated output directory, containing the raw results and statistics.
+
+## featureCounts
+
+[featureCounts](http://bioinf.wehi.edu.au/featureCounts/) is a highly-efficent tool that summarizes
+mapped reads for genomic features. We use it to compute raw count values for each gene and cell.
+
+**Output directory: `results/featureCounts`**
+
+- `resultCOUNT.txt`
+  - tab sparated count matrix for all genes and cells.
+- `<CELL>`
+  - For each cell, there's a dedicated output directory, containing the raw results and statistics.

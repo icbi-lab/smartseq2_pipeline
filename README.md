@@ -2,8 +2,9 @@
 
 **Preprocess scRNA-seq data generated with the SmartSeq2 protocol.**.
 
-[![Build Status](https://travis-ci.com/nf-core/smartseq.svg?branch=master)](https://travis-ci.com/nf-core/smartseq)
-[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A50.32.0-brightgreen.svg)](https://www.nextflow.io/)
+[![GitHub Actions CI Status](https://github.com/nf-core/foo/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/foo/actions)
+[![GitHub Actions Linting Status](https://github.com/nf-core/foo/workflows/nf-core%20linting/badge.svg)](https://github.com/nf-core/foo/actions)
+[![Nextflow](https://img.shields.io/badge/nextflow-%E2%89%A519.10.0-brightgreen.svg)](https://www.nextflow.io/)
 
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg)](http://bioconda.github.io/)
 [![Docker](https://img.shields.io/docker/automated/nfcore/smartseq.svg)](https://hub.docker.com/r/nfcore/smartseq)
@@ -26,7 +27,7 @@ The nf-core/smartseq pipeline comes with documentation about the pipeline, found
 5. [Troubleshooting](https://nf-co.re/usage/troubleshooting)
 
 This pipeline was developed to process single cell RNA-seq data generated
-using the Smart-Seq2 protocol.
+using the [Smart-Seq2 protocol](https://www.nature.com/articles/nprot.2014.006).
 
 The pipeline features:
 
@@ -34,6 +35,7 @@ The pipeline features:
 - Alignment using `STAR`
 - Quantification using `rsem` or `featureCounts`
 - TCR analysis using `TraCeR`.
+- BCR analysis using `BraCeR`.
 
 ![flowchart](assets/flowchart.png)
 
