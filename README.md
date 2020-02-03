@@ -1,5 +1,9 @@
 # nf-core/smartseq
 
+## Please use the version on nf-core: https://github.com/nf-core/smartseq2
+
+----
+
 **Preprocess scRNA-seq data generated with the SmartSeq2 protocol.**.
 
 [![GitHub Actions CI Status](https://github.com/nf-core/foo/workflows/nf-core%20CI/badge.svg)](https://github.com/nf-core/foo/actions)
