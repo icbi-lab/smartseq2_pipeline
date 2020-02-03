@@ -2,7 +2,18 @@
 
 This document describes the output produced by the pipeline. Most of the plots are taken from the MultiQC report, which summarises results at the end of the pipeline.
 
-<!-- TODO nf-core: Write this documentation describing your workflow's output -->
+## Table of contents
+- [nf-core/smartseq: Output](#nf-coresmartseq-output)
+  - [Table of contents](#table-of-contents)
+  - [Pipeline overview](#pipeline-overview)
+  - [FastQC](#fastqc)
+  - [MultiQC](#multiqc)
+  - [BraCeR](#bracer)
+  - [TraCeR](#tracer)
+  - [STAR](#star)
+  - [RSEM](#rsem)
+  - [featureCounts](#featurecounts)
+
 
 ## Pipeline overview
 
