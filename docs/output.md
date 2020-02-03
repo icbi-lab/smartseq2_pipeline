@@ -81,11 +81,11 @@ For more information about how to use MultiQC reports, see [http://multiqc.info]
 
 **Output directory: `results/STAR`**
 
-- `[CELL]`/[CELL].Aligned.toTranscriptome.out.bam`
+- `[CELL]/[CELL].Aligned.toTranscriptome.out.bam`
   - BAM file aligned to the transcriptome
-- `[CELL]`/[CELL].Aligned.sortedByCoord.out.bam`
+- `[CELL]/[CELL].Aligned.sortedByCoord.out.bam`
   - The same BAM file, but sorted
-- `[CELL]`/[CELL].Log.final.out`
+- `[CELL]/[CELL].Log.final.out`
   - The STAR alignment report, containing mapping results summary.
 
 ## RSEM
