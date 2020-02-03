@@ -50,7 +50,7 @@ For more information about how to use MultiQC reports, see [http://multiqc.info]
 
 - `filtered_BCR_summary/IMGT_gapped_db.tab`
   - summary of all detected Immunoglobuling chains for all cells
-- `<CELL>`
+- `[CELL]`
   - For each cell, there's a dedicated output directory containing more detailed information than what's in the summary.
 
 ## TraCeR
@@ -61,7 +61,7 @@ For more information about how to use MultiQC reports, see [http://multiqc.info]
 
 - `filtered_TCR_summary/cell_data.csv`
   - summary of all detected T cell receptor chains for all cells
-- `<CELL>`
+- `[CELL]`
   - For each cell, there's a dedicated output directory containing more detailed information than what's in the summary.
 
 ## STAR
@@ -70,11 +70,11 @@ For more information about how to use MultiQC reports, see [http://multiqc.info]
 
 **Output directory: `results/STAR`**
 
-- `<CELL>`/<CELL>.Aligned.toTranscriptome.out.bam`
+- `[CELL]`/[CELL].Aligned.toTranscriptome.out.bam`
   - BAM file aligned to the transcriptome
-- `<CELL>`/<CELL>.Aligned.sortedByCoord.out.bam`
+- `[CELL]`/[CELL].Aligned.sortedByCoord.out.bam`
   - The same BAM file, but sorted
-- `<CELL>`/<CELL>.Log.final.out`
+- `[CELL]`/[CELL].Log.final.out`
   - The STAR alignment report, containing mapping results summary.
 
 ## RSEM
@@ -87,7 +87,7 @@ values for each cell.
 
 - `resultTPM.txt`
   - tab separated TPM matrix for all genes and cells.
-- `<CELL>`
+- `[CELL]`
   - For each cell, there's a dedicated output directory, containing the raw results and statistics.
 
 ## featureCounts
@@ -99,5 +99,5 @@ mapped reads for genomic features. We use it to compute raw count values for eac
 
 - `resultCOUNT.txt`
   - tab sparated count matrix for all genes and cells.
-- `<CELL>`
+- `[CELL]`
   - For each cell, there's a dedicated output directory, containing the raw results and statistics.
